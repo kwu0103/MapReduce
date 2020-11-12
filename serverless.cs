@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,7 +22,13 @@ namespace mapreduce
             var input = context.GetInput<string>();
             //Console.WriteLine(input);
             var response = new WebClient().DownloadString(input);
-            Console.WriteLine(response);
+            // remove punctuation
+            string minimal = new string(response.Where(c => !char.IsPunctuation(c)).ToArray());
+            //remove newline
+            minimal = Regex.Replace(minimal,@"\t|\n|\r","");
+            //remove double space 
+            minimal = Regex.Replace(minimal,@"\s+"," ");
+            Console.WriteLine(minimal);
             var outputs = new List<string>();
             
             //Console.writeLine(input);
