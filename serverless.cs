@@ -19,8 +19,11 @@ namespace mapreduce
         public static async Task<List<string>> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
+            //test n-gram
+            var n = 2;
+            //get url
             var input = context.GetInput<string>();
-            //Console.WriteLine(input);
+            //get-txt
             var response = new WebClient().DownloadString(input);
             // remove punctuation
             string minimal = new string(response.Where(c => !char.IsPunctuation(c)).ToArray());
@@ -28,7 +31,35 @@ namespace mapreduce
             minimal = Regex.Replace(minimal,@"\t|\n|\r","");
             //remove double space 
             minimal = Regex.Replace(minimal,@"\s+"," ");
-            Console.WriteLine(minimal);
+            //Console.WriteLine(minimal);
+
+            Dictionary<string,int> counts = new Dictionary<string, int>();
+            
+            string[] words = minimal.Split(" ");
+            for(int i = 0; i < words.Length - (n-1); i++)
+            {
+                var grams = $"\n{words[i]} {words[i + 1]}";
+
+                // Add method throws an exception if the new key is already in the dictionary
+                try
+                {
+                    counts.Add(grams,1);
+                }
+                catch (ArgumentException)
+                {
+                    counts[grams] += 1;
+                }
+                
+            }
+
+            foreach(KeyValuePair<string,int> kvp in counts)
+            {
+                if (kvp.Value >= 2)
+                {
+                    Console.WriteLine("Key: {0}, Value:{1}", kvp.Key, kvp.Value);
+                }
+            }
+
             var outputs = new List<string>();
             
             //Console.writeLine(input);
