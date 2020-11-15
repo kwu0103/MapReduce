@@ -48,7 +48,7 @@ namespace mapreduce
             var parallelTasks = new List<Task<string>>();
             for (int i = 0; i < size; i++) {
                 var key = arrayofKeys[i];
-                Task<string> tmp = context.CallActivityAsync<string>(nameof(MapperAsync),input[key]);
+                Task<string> tmp = context.CallActivityAsync<string>("MapperAsync",input[key]);
                 parallelTasks.Add(tmp);
             }
             await Task.WhenAll(parallelTasks);
@@ -120,6 +120,7 @@ namespace mapreduce
             log.LogInformation($"Saying hello to {name}.");
             return $"Hello {name}!";
         }
+
         [FunctionName("MapperAsync")]
         public static async Task<string> MapperAsync ([ActivityTrigger] string info)
         {
